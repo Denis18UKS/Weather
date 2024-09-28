@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Погода в городах</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <h1>Погода в городах</h1>
+    <form action="get_weather.php">
+        <select id="city-select">
+            <option value="479561">Уфа</option>
+            <option value="524901">Москва</option> <!-- ID для Москвы -->
+            <option value="498817">Санкт-Петербург</option> <!-- ID для СПб -->
+            <option value="1502028">Казань</option> <!-- ID для Казани -->
+            <option value="151401">Екатеринбург</option> <!-- ID для Екатеринбурга -->
+            <option value="500411">Самара</option> <!-- ID для Самары -->
+        </select>
+    </form>
+    <div id="weather">
+        <p>Загрузка данных...</p>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $('#city-select').change(function () {
+                var cityId = $(this).val();
+                getWeather(cityId);
+            });
+
+            // Функция для получения погоды по ID города
+            function getWeather(cityId) {
+                $('#weather').html('<p>Загрузка данных...</p>'); // Сброс сообщения загрузки
+
+                $.ajax({
+                    url: 'get_weather.php',
+                    type: 'GET',
+                    data: { id: cityId }, // Передаем ID города на сервер
+                    success: function (data) {
+                        var weather = JSON.parse(data);
+                        var html = "<p>Температура: " + weather.main.temp + "°C</p>";
+                        html += "<p>Описание: " + weather.weather[0].description + "</p>";
+                        html += "<p>Влажность: " + weather.main.humidity + "%</p>";
+                        $('#weather').html(html);
+                    },
+                    error: function () {
+                        $('#weather').html('<p>Ошибка при получении данных</p>');
+                    }
+                });
+            }
+
+            // Получить погоду для начального города (по умолчанию)
+            getWeather($('#city-select').val());
+        });
+    </script>
+</body>
+
+</html>
